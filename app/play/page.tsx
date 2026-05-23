@@ -372,7 +372,7 @@ export default function Home() {
             <p className="text-6xl font-black text-green-400">{finalScore}</p>
 
 <a
-  href="https://grownow1-0-0.vercel.appE"
+  href="https://grownow1-0-0.vercel.app"
   target="_blank"
   rel="noopener noreferrer"
   className="mt-5 block w-full rounded-2xl border border-green-400/30 bg-green-500/10 px-4 py-3 text-center text-sm font-black uppercase tracking-widest text-green-300 transition hover:bg-green-500/20"
