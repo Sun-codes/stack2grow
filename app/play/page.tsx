@@ -342,8 +342,10 @@ export default function Home() {
 
   return (
     <main className="relative h-screen w-screen overflow-hidden bg-black">
-      <canvas ref={canvasRef} />
-
+      <canvas
+  ref={canvasRef}
+  className={gameOver ? "pointer-events-none" : ""}
+/>
       <div className="pointer-events-none absolute left-0 top-0 w-full p-5 text-white">
         <div className="inline-flex rounded-2xl border border-white/10 bg-black/40 px-4 py-3 backdrop-blur-md">
           <div>
@@ -357,7 +359,7 @@ export default function Home() {
       </div>
 
       {gameOver && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/60 p-6 backdrop-blur-sm">
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 p-6 backdrop-blur-sm">
           <div className="w-full max-w-sm rounded-3xl border border-white/10 bg-zinc-950 p-6 text-center text-white shadow-2xl">
             <p className="text-sm font-bold uppercase tracking-[0.3em] text-purple-400">
               Game Over
