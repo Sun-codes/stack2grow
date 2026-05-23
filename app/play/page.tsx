@@ -357,7 +357,20 @@ export default function Home() {
 
             <p className="text-6xl font-black text-green-400">{finalScore}</p>
 
-            <input
+<a
+  href="https://grownow1-0-0.vercel.appE"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="mt-5 block w-full rounded-2xl border border-green-400/30 bg-green-500/10 px-4 py-3 text-center text-sm font-black uppercase tracking-widest text-green-300 transition hover:bg-green-500/20"
+>
+  Visit GrowNow!
+</a>
+
+<p className="mt-5 text-sm font-bold text-zinc-400">
+  Enter your name to save your score
+</p>
+
+<input
               value={playerName}
               onChange={(e) => setPlayerName(e.target.value)}
               placeholder="Enter your name"
