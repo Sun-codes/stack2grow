@@ -5,10 +5,10 @@ import { supabase } from "@/lib/supabase";
 
 const deathMessages = [
   "Scope creep collapsed the stack.",
-  "Client changed the brief.",
-  "Deadline missed.",
+  "Client minta revisi.",
+  "Kelewat deadline.",
   "Budget got cut.",
-  "Revision ke-19 broke the tower.",
+  "Revisi ke-19 broke the tower.",
   "The project requirements shifted mid-air.",
 ];
 
@@ -21,13 +21,9 @@ export default function Home() {
   const [playerName, setPlayerName] = useState("");
 
   useEffect(() => {
-     const canvasEl = canvasRef.current;
-
-     if (!canvasEl) return;
-
-     const canvas = canvasEl;
-
+    const canvas = canvasRef.current!;
     const ctx = canvas.getContext("2d")!;
+
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
@@ -38,8 +34,10 @@ export default function Home() {
       height: number;
     };
 
-    const blockHeight = 34;
-    const baseWidth = Math.min(260, canvas.width * 0.65);
+    const blockHeight = 28;
+    const baseWidth = Math.min(190, canvas.width * 0.48);
+    const inputCooldownMs = 280;
+
     const centerX = canvas.width / 2 - baseWidth / 2;
 
     const blocks: Block[] = [
@@ -63,17 +61,16 @@ export default function Home() {
     let score = 0;
     let cameraOffset = 0;
     let isGameOver = false;
+    let lastInputTime = 0;
 
     function triggerGameOver() {
       if (isGameOver) return;
 
       isGameOver = true;
       setFinalScore(score);
-
       setDeathMessage(
         deathMessages[Math.floor(Math.random() * deathMessages.length)]
       );
-
       setGameOver(true);
     }
 
@@ -83,7 +80,6 @@ export default function Home() {
       const previous = blocks[blocks.length - 1];
 
       const overlapLeft = Math.max(current.x, previous.x);
-
       const overlapRight = Math.min(
         current.x + current.width,
         previous.x + previous.width
@@ -100,7 +96,6 @@ export default function Home() {
       current.width = overlapWidth;
 
       blocks.push({ ...current });
-
       score++;
 
       const nextY = current.y - blockHeight;
@@ -113,7 +108,6 @@ export default function Home() {
       };
 
       direction *= -1;
-
       speed = Math.min(speed + 0.25, 9);
 
       if (current.y - cameraOffset < canvas.height * 0.35) {
@@ -121,12 +115,19 @@ export default function Home() {
       }
     }
 
-    function handleInput() {
+    function handleInput(event: Event) {
+      event.preventDefault();
+
+      const now = Date.now();
+
+      if (now - lastInputTime < inputCooldownMs) return;
+
+      lastInputTime = now;
       placeBlock();
     }
 
     window.addEventListener("keydown", handleInput);
-    window.addEventListener("touchstart", handleInput);
+    window.addEventListener("touchstart", handleInput, { passive: false });
     window.addEventListener("mousedown", handleInput);
 
     function drawBlock(block: Block, index: number, isCurrent = false) {
@@ -146,22 +147,19 @@ export default function Home() {
       ctx.fillRect(block.x, y, block.width, block.height);
 
       ctx.fillStyle = "rgba(255,255,255,0.18)";
-      ctx.fillRect(block.x, y, block.width, 6);
+      ctx.fillRect(block.x, y, block.width, 5);
 
       ctx.fillStyle = "white";
-      ctx.font = "bold 12px sans-serif";
+      ctx.font = "bold 11px sans-serif";
 
       ctx.fillText(
         index === 0 ? "GrowNow Base" : `Project ${index}`,
-        block.x + 10,
-        y + 22
+        block.x + 8,
+        y + 19
       );
     }
 
-    function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // BACKGROUND
+    function drawBackground() {
       const bg = ctx.createLinearGradient(0, 0, 0, canvas.height);
 
       bg.addColorStop(0, "#14051f");
@@ -171,7 +169,6 @@ export default function Home() {
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // GRID
       ctx.strokeStyle = "rgba(255,255,255,0.04)";
       ctx.lineWidth = 1;
 
@@ -189,7 +186,6 @@ export default function Home() {
         ctx.stroke();
       }
 
-      // GLOW
       const glow = ctx.createRadialGradient(
         canvas.width / 2,
         canvas.height * 0.35,
@@ -205,7 +201,6 @@ export default function Home() {
       ctx.fillStyle = glow;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // PARTICLES
       ctx.fillStyle = "rgba(168,85,247,0.08)";
 
       for (let i = 0; i < 18; i++) {
@@ -221,6 +216,12 @@ export default function Home() {
 
         ctx.fill();
       }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawBackground();
 
       if (!isGameOver) {
         current.x += speed * direction;
@@ -237,22 +238,15 @@ export default function Home() {
       }
 
       blocks.forEach((block, index) => drawBlock(block, index));
-
       drawBlock(current, blocks.length, true);
 
-      // SCORE
       ctx.fillStyle = "white";
       ctx.font = "bold 42px sans-serif";
       ctx.fillText(score.toString(), 28, 64);
 
       ctx.fillStyle = "rgba(255,255,255,0.55)";
       ctx.font = "14px sans-serif";
-
-      ctx.fillText(
-        "Tap anywhere to lock the project",
-        28,
-        90
-      );
+      ctx.fillText("Tap anywhere to lock the project", 28, 90);
 
       requestAnimationFrame(animate);
     }
@@ -285,14 +279,11 @@ export default function Home() {
       "nigga",
       "nigger",
       "asshole",
-      "motherfucker"
+      "motherfucker",
     ];
 
     const lowerName = cleanName.toLowerCase();
-
-    const isBadName = bannedWords.some((word) =>
-      lowerName.includes(word)
-    );
+    const isBadName = bannedWords.some((word) => lowerName.includes(word));
 
     if (isBadName) {
       alert("Invalid name.");
@@ -322,12 +313,10 @@ export default function Home() {
         return;
       }
     } else {
-      const { error } = await supabase
-        .from("scores")
-        .insert({
-          name: cleanName,
-          score: finalScore,
-        });
+      const { error } = await supabase.from("scores").insert({
+        name: cleanName,
+        score: finalScore,
+      });
 
       if (error) {
         console.error(error);
@@ -346,9 +335,7 @@ export default function Home() {
       <div className="pointer-events-none absolute left-0 top-0 w-full p-5 text-white">
         <div className="inline-flex rounded-2xl border border-white/10 bg-black/40 px-4 py-3 backdrop-blur-md">
           <div>
-            <h1 className="text-lg font-black tracking-tight">
-              GrowStack
-            </h1>
+            <h1 className="text-lg font-black tracking-tight">GrowStack</h1>
 
             <p className="text-xs text-zinc-400">
               Stack projects. Build your career.
@@ -364,17 +351,11 @@ export default function Home() {
               Game Over
             </p>
 
-            <h1 className="mt-3 text-3xl font-black">
-              {deathMessage}
-            </h1>
+            <h1 className="mt-3 text-3xl font-black">{deathMessage}</h1>
 
-            <p className="mt-4 text-zinc-400">
-              Projects Completed
-            </p>
+            <p className="mt-4 text-zinc-400">Projects Completed</p>
 
-            <p className="text-6xl font-black text-green-400">
-              {finalScore}
-            </p>
+            <p className="text-6xl font-black text-green-400">{finalScore}</p>
 
             <input
               value={playerName}
