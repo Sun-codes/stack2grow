@@ -116,15 +116,27 @@ export default function Home() {
     }
 
     function handleInput(event: Event) {
-      event.preventDefault();
+  const target = event.target as HTMLElement;
 
-      const now = Date.now();
+  if (
+    target.tagName === "INPUT" ||
+    target.tagName === "BUTTON" ||
+    target.tagName === "A"
+  ) {
+    return;
+  }
 
-      if (now - lastInputTime < inputCooldownMs) return;
+  if (event.type === "touchstart") {
+    event.preventDefault();
+  }
 
-      lastInputTime = now;
-      placeBlock();
-    }
+  const now = Date.now();
+
+  if (now - lastInputTime < inputCooldownMs) return;
+
+  lastInputTime = now;
+  placeBlock();
+}
 
     window.addEventListener("keydown", handleInput);
     window.addEventListener("touchstart", handleInput, { passive: false });
